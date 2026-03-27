@@ -14,7 +14,6 @@ public final class Project7 extends Project {
 
     public String generateAssemblyCode(String[] parts) {
         this.commands = parts;
-
         if(this.commands.length > 0) {
             switch (this.commands[0].trim()) {
                 case "push":
@@ -34,6 +33,7 @@ public final class Project7 extends Project {
     private String push() {
         String type = "";
         String location = this.commands[2];
+        String pointer = "THIS";
 
         switch (this.commands[1]) {
             case "constant":
@@ -53,6 +53,38 @@ public final class Project7 extends Project {
             case "this":
                 type = "THIS";
                 break;
+            case "argument":
+                type = "ARG";
+                break;
+            case "temp":
+                Integer segment = 5 + Integer.parseInt(location);
+                return String.format("@R%s\n" +
+                    "D=M\n" +
+                    "@SP\n" +
+                    "A=M\n" +
+                    "M=D\n" +
+                    "@SP\n" +
+                    "M=M+1\n", segment);
+            case "pointer":
+                if(this.commands[2].equals("1")) {
+                    pointer = "THAT";
+                }
+                return String.format("@%s\n" +
+                        "D=M\n" +
+                        "@SP\n" +
+                        "A=M\n" +
+                        "M=D\n" +
+                        "@SP\n" +
+                        "M=M+1\n", pointer);
+            case "static":
+                return String.format("@FileName.%s\n" +
+                        "D=M\n" +
+                        "\n" +
+                        "@SP\n" +
+                        "A=M\n" +
+                        "M=D\n" +
+                        "@SP\n" +
+                        "M=M+1\n", this.commands[2]);
         }
 
         return String.format("@%s\n" +
@@ -70,6 +102,7 @@ public final class Project7 extends Project {
     private String pop() {
         String type = "";
         String location = this.commands[2];
+        String pointer = "THIS";
 
         switch (this.commands[1]) {
             case "local":
@@ -92,12 +125,27 @@ public final class Project7 extends Project {
                     "D=M\n" +
                     "@R%s\n" +
                     "M=D\n", segment);
+            case "pointer":
+                if(this.commands[2].equals("1")) {
+                    pointer = "THAT";
+                }
+                return String.format("@SP\n" +
+                    "AM=M-1\n" +
+                    "D=M\n" +
+                    "@%s\n" +
+                    "M=D\n", pointer);
+            case "static":
+                return String.format("@SP\n" +
+                        "AM=M-1\n" +
+                        "D=M\n" +
+                        "@FileName.%s\n" +
+                        "M=D\n", this.commands[2]);
         }
 
         return String.format("@%s\n" +
             "D=M\n" +
             "@%s\n" +
-            "D=D*A\n" +
+            "D=D+A\n" +
             "@R13\n" +
             "M=D\n" +
             "@SP\n" +

@@ -22,7 +22,7 @@ public class Main {
 
                 while ((line = reader.readLine()) != null) {
                     if(!assembler.isComment(line)) {
-                        content =  content + assembler.assemble(line);
+                        content += assembler.assemble(line);
                     }
                 }
 
